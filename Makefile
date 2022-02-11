@@ -1,3 +1,3 @@
 .PHONY: build
 build:
-	go build -o ./bin/hhot ../hhot/cmd
+	go build -o ./bin/hhot ./cmd/hhot
