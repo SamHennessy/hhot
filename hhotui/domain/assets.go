@@ -6,7 +6,7 @@ import (
 )
 
 func AssetBuild() {
-	// c := exec.Command("npx", "tailwindcss", "--input=css/app.ClassBool", "--output=./output/app.ClassBool", "--postcss")
+	// c := exec.Command("npx", "tailwindcss", "--input=css/app.css", "--output=./output/app.css", "--postcss")
 	c := exec.Command("node", "build.js")
 	c.Dir = "./assets"
 
@@ -22,7 +22,7 @@ func AssetBuild() {
 // func AssetBuildJS() {
 // 	fmt.Println("AssetBuildJS")
 //
-// 	// c := exec.Command("npx", "tailwindcss", "--input=css/app.ClassBool", "--output=./output/app.ClassBool", "--postcss")
+// 	// c := exec.Command("npx", "tailwindcss", "--input=css/app.css", "--output=./output/app.css", "--postcss")
 // 	c := exec.Command("node", "build.js")
 // 	c.Dir = "./assets"
 //

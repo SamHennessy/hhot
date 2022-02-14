@@ -47,11 +47,11 @@ func (am *AssetManager) path(path string) string {
 }
 
 func (am *AssetManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == am.path("css/app.ClassBool") {
+	if r.URL.Path == am.path("css/app.css") {
 		w.Header().Add("Content-Type", "text/css")
 		_, err := w.Write(am.css)
 		if err != nil {
-			am.logger.Err(err).Msg("serve app.ClassBool")
+			am.logger.Err(err).Msg("serve app.css")
 		}
 
 		return
@@ -73,7 +73,7 @@ func (am *AssetManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (am *AssetManager) Tags() *l.NodeGroup {
 	return l.G(
-		l.T("link", l.Attrs{"rel": "stylesheet", "href": am.path("css/app.ClassBool?v=" + am.hashCSS)}),
+		l.T("link", l.Attrs{"rel": "stylesheet", "href": am.path("css/app.css?v=" + am.hashCSS)}),
 		l.T("script", l.Attrs{"src": am.path("js/app.js?v=" + am.hashJS), "defer": ""}),
 	)
 }
