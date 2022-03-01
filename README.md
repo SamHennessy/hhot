@@ -1,3 +1,5 @@
 # HHot
 
-go install github.com/SamHennessy/hhot/cmd/hhot
+```shell
+go install github.com/SamHennessy/hhot/cmd/hhot@latest
+```
