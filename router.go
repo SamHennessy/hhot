@@ -253,7 +253,7 @@ func (r *Router) ReplacePage(newPath string, oldPage *l.Page, isHistory bool) {
 	}
 
 	if oldPage.IsConnected() {
-		oldPage.Close(context.Background())
+		oldPage.Close(sess.InitialContext)
 	}
 
 	newPage := rout.pageFn()
@@ -265,7 +265,7 @@ func (r *Router) ReplacePage(newPath string, oldPage *l.Page, isHistory bool) {
 		HistoryPush(path, newPage.DOM.HTML)
 	}
 
-	ctx := context.WithValue(context.Background(), ctxKeyRouteInfo, r.routeDataFromRequest(path, parts, rout))
+	ctx := context.WithValue(sess.InitialContext, ctxKeyRouteInfo, r.routeDataFromRequest(path, parts, rout))
 
 	err := newPage.ServeWS(ctx, sess.ID, sess.Send, sess.Receive)
 	if err != nil {

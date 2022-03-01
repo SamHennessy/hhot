@@ -3,7 +3,6 @@ package site
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -155,7 +154,7 @@ func (s *Server) MainLoop(outerCTX context.Context, watcher *fsnotify.Watcher) {
 
 				if strings.HasSuffix(event.Name, ".go") {
 					now := time.Now()
-					log.Println("fsnotify: ", event.Name, " - ", now.String())
+					//log.Println("fsnotify: ", event.Name, " - ", now.String())
 
 					if now.Sub(lastTiggerBuild.when) > 5*time.Second {
 						lastTiggerBuild.when = now
