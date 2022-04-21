@@ -2,18 +2,17 @@ package main
 
 import (
 	"context"
+	"github.com/SamHennessy/hhot/hhotui/domain"
+	"github.com/SamHennessy/hhot/hhotui/domain/topics"
+	"github.com/SamHennessy/hhot/hhotui/site"
+	"github.com/SamHennessy/hlive/hlivekit"
+	"github.com/fsnotify/fsnotify"
 	"io/fs"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"strings"
 	"syscall"
-
-	"github.com/SamHennessy/hhot/hhotui/domain"
-	"github.com/SamHennessy/hhot/hhotui/domain/topics"
-	"github.com/SamHennessy/hhot/hhotui/site"
-	"github.com/SamHennessy/hlive/hlivekit"
-	"github.com/fsnotify/fsnotify"
 )
 
 func main() {
@@ -51,7 +50,19 @@ func StartHot() {
 	go server.MainLoop(ctx, watcher)
 
 	// Walk file system
-	err = filepath.Walk("./", func(path string, info fs.FileInfo, err error) error {
+	err = filepath.Walk("./cmd", func(path string, info fs.FileInfo, err error) error {
+		if info.IsDir() && !strings.Contains(path, "hhot") && !strings.Contains(path, "node_modules") && !strings.Contains(path, "dist") {
+			if err := watcher.Add(path); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		sl.Logger().Err(err).Msg("watcher file path walk")
+	}
+	err = filepath.Walk("./site", func(path string, info fs.FileInfo, err error) error {
 		if info.IsDir() && !strings.Contains(path, "hhot") && !strings.Contains(path, "node_modules") && !strings.Contains(path, "dist") {
 			if err := watcher.Add(path); err != nil {
 				return err
