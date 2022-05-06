@@ -277,6 +277,7 @@ func (r *Router) ReplacePage(newPath string, oldPage *l.Page, isHistory bool) {
 func Link(path string, elements ...interface{}) *InternalRoute {
 	a := &InternalRoute{
 		Component: l.C("a",
+			l.PreventDefault(),
 			l.Attrs{"href": path},
 			elements,
 		),

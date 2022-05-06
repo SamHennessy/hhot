@@ -7,7 +7,7 @@ import (
 
 func AssetBuild() {
 	// c := exec.Command("npx", "tailwindcss", "--input=css/app.css", "--output=./output/app.css", "--postcss")
-	c := exec.Command("node", "build.js")
+	c := exec.Command("node", "build")
 	c.Dir = "./assets"
 
 	out, err := c.CombinedOutput()
