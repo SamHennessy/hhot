@@ -52,6 +52,18 @@ func (am *AssetManager) pathFav(path string) string {
 	return am.config.BasePath() + "img/favicons/" + path
 }
 
+func (am *AssetManager) pathFont(path string) string {
+	return am.config.BasePath() + "fonts/" + path
+}
+
+func (am *AssetManager) pathImg(path string) string {
+	return am.config.BasePath() + "img/" + path
+}
+
+func (am *AssetManager) pathJs(path string) string {
+	return am.config.BasePath() + "js/" + path
+}
+
 // TODO: Deprecate
 func (am *AssetManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == am.path("css/app.css") {
@@ -79,7 +91,7 @@ func (am *AssetManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // https://www.emergeinteractive.com/insights/detail/the-essentials-of-favicons/
-func (am *AssetManager) fonts(w http.ResponseWriter, r *http.Request) bool {
+func (am *AssetManager) favicons(w http.ResponseWriter, r *http.Request) bool {
 	if r.URL.Path == am.pathFav("site.webmanifest") {
 		w.Header().Add("Content-Type", "application/manifest+json")
 
@@ -140,10 +152,53 @@ func (am *AssetManager) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
+		if r.URL.Path == am.path("js/app.js.map") {
+			w.Header().Add("Content-Type", "text/javascript")
+
+			file := strings.TrimPrefix(r.URL.Path, am.pathJs(""))
+			http.ServeFile(w, r, "./assets/dist/js/"+file)
+
+			return
+		}
+
+		if am.favicons(w, r) {
+			return
+		}
+
 		if am.fonts(w, r) {
+			return
+		}
+
+		if am.images(w, r) {
 			return
 		}
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (am *AssetManager) fonts(w http.ResponseWriter, r *http.Request) bool {
+	if strings.HasPrefix(r.URL.Path, am.pathFont("")) {
+		file := strings.TrimPrefix(r.URL.Path, am.pathFont(""))
+		http.ServeFile(w, r, "./assets/dist/fonts/"+file)
+
+		return true
+	}
+
+	return false
+}
+
+func (am *AssetManager) images(w http.ResponseWriter, r *http.Request) bool {
+	if strings.HasPrefix(r.URL.Path, am.pathImg("")) {
+		file := strings.TrimPrefix(r.URL.Path, am.pathImg(""))
+		http.ServeFile(w, r, "./assets/dist/img/"+file)
+
+		return true
+	}
+
+	return false
+}
+
+func (am *AssetManager) ImageSrc(path string) string {
+	return am.config.BasePath() + "img/" + path
 }
