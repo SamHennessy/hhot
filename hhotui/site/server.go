@@ -2,7 +2,7 @@ package site
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -23,9 +23,9 @@ func Serve(sl *ServiceLocatorSite) {
 	Router(sl)
 
 	sl.Logger().Info().Str("address", "http://localhost:3333").Msg("start ui")
-	fmt.Println("HHot UI: http://localhost:3333")
+	log.Println("HHot UI: http://localhost:3333")
 	if err := http.ListenAndServe(":3333", nil); err != nil {
-		fmt.Println("HHot UI: ERROR: http listen and serve: ", err)
+		log.Println("HHot UI: ERROR: http listen and serve: ", err)
 	}
 }
 
@@ -55,11 +55,10 @@ func (s *Server) MainLoop(outerCTX context.Context, watcher *fsnotify.Watcher) {
 		triggerAppStart   = make(chan bool)
 		triggerAppRestart = make(chan bool)
 
-		lastTiggerBuild lastTrigger
+		lastTriggerBuild lastTrigger
 	)
 
-	// go domain.AssetBuildJS()
-	// go domain.AssetBuildCSS()
+	go domain.AssetBuild()
 
 	s.sl.Logger().Info().Msg("build app")
 	err := domain.StartBuild(s.sl)
@@ -128,7 +127,6 @@ func (s *Server) MainLoop(outerCTX context.Context, watcher *fsnotify.Watcher) {
 
 				<-assetBuildDone
 			} else {
-
 				<-assetBuildDone
 
 				ctx, cancel = context.WithCancel(context.Background())
@@ -154,19 +152,16 @@ func (s *Server) MainLoop(outerCTX context.Context, watcher *fsnotify.Watcher) {
 
 				if strings.HasSuffix(event.Name, ".go") {
 					now := time.Now()
-					//log.Println("fsnotify: ", event.Name, " - ", now.String())
 
-					if now.Sub(lastTiggerBuild.when) > 5*time.Second {
-						lastTiggerBuild.when = now
-						lastTiggerBuild.name = event.Name
+					if now.Sub(lastTriggerBuild.when) > 5*time.Second {
+						lastTriggerBuild.when = now
+						lastTriggerBuild.name = event.Name
 
 						go s.sl.AppPubSub().Publish(topics.TriggerBuild, nil)
 					}
 				} else if strings.HasSuffix(event.Name, ".json") || strings.HasSuffix(event.Name, ".js") {
-					//log.Println("fsnotify: ", event.Name)
 					go s.sl.AppPubSub().Publish(topics.TriggerBuildJS, nil)
 				} else if strings.HasSuffix(event.Name, ".css") {
-					//log.Println("fsnotify: ", event.Name)
 					go s.sl.AppPubSub().Publish(topics.TriggerBuildCSS, nil)
 				}
 			}
@@ -176,7 +171,9 @@ func (s *Server) MainLoop(outerCTX context.Context, watcher *fsnotify.Watcher) {
 				file, err := os.Stat(event.Name)
 				if err != nil {
 					s.sl.Logger().Err(err).Msg("os.Stat")
-				} else if file.IsDir() && file.Name() != "dist" {
+				} else if strings.HasSuffix(file.Name(), "~") {
+					// Nop
+				} else if file.IsDir() && (file.Name() != "dist" || file.Name() != "node_modules") {
 					if err := watcher.Add(event.Name); err != nil {
 						s.sl.Logger().Err(err).Msg("ERROR: watch new dir")
 					}

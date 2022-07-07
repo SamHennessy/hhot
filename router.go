@@ -303,3 +303,18 @@ func (a *InternalRoute) PubSubMount(ctx context.Context, pubSub *hlivekit.PubSub
 func InternalRedirect(pubSub *hlivekit.PubSub, path string) {
 	pubSub.Publish(TopicRedirectInternal, path)
 }
+
+func InternalRedirectListener(pubSub *hlivekit.PubSub, hhr *Router, page *l.Page) (unsubscribe func()) {
+	subFn := pubSub.SubscribeFunc(func(message hlivekit.QueueMessage) {
+		path, ok := message.Value.(string)
+		if !ok {
+			return
+		}
+
+		go hhr.ReplacePage(path, page, message.Topic == TopicRedirectInternalHistory)
+	}, TopicRedirectInternal, TopicRedirectInternalHistory)
+
+	return func() {
+		pubSub.Unsubscribe(subFn, TopicRedirectInternal, TopicRedirectInternalHistory)
+	}
+}

@@ -13,3 +13,11 @@ go install github.com/SamHennessy/hhot/cmd/hhot@latest
 ```shell
 export PATH=$(go env GOPATH)/bin:$PATH
 ```
+
+## Development
+
+Build and install locally
+
+```shell
+go install ./cmd/hhot
+```
