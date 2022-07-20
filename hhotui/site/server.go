@@ -58,7 +58,7 @@ func (s *Server) MainLoop(outerCTX context.Context, watcher *fsnotify.Watcher) {
 		lastTriggerBuild lastTrigger
 	)
 
-	go domain.AssetBuild()
+	domain.AssetBuild()
 
 	s.sl.Logger().Info().Msg("build app")
 	err := domain.StartBuild(s.sl)

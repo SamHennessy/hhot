@@ -17,6 +17,7 @@ if (!window.hhotIframeWatcherDelay) {
             const ids = hlive.getEventHandlerIDs(el)
 
             // Change?
+            // TODO: el.contentDocument can be null
             if (el.hhotIframeWatcherTitle === el.contentDocument.title &&
                 el.hhotIframeWatcherPathname === el.contentWindow.location.pathname
             ) {
@@ -47,6 +48,7 @@ if (!window.hhotIframeWatcherDelay) {
         }
     }
 
+    // TODO: we are getting very long setTimeout chains
     setTimeout(watcher, window.hhotIframeWatcherDelay)
 } else {
     // Delay may have changed between page loads

@@ -8,6 +8,7 @@ import (
 
 	l "github.com/SamHennessy/hlive"
 	"github.com/SamHennessy/hlive/hlivekit"
+	"github.com/rs/zerolog"
 )
 
 const routePartWild = "<wild>"
@@ -66,6 +67,7 @@ func NewRouter(sl ServiceLocator) *Router {
 		},
 		store:  sl.PageSessionStore(),
 		config: sl.Config(),
+		log:    sl.Logger(),
 	}
 }
 
@@ -74,6 +76,7 @@ type Router struct {
 	tree   *routeTreeNode
 	store  *l.PageSessionStore
 	config Config
+	log    *zerolog.Logger
 }
 
 func (r *Router) normalisePath(path string) string {
@@ -237,17 +240,15 @@ func (r *Router) ReplacePage(newPath string, oldPage *l.Page, isHistory bool) {
 	path, parts, rout := r.matchInternal(newPath)
 
 	// Found?
-	// TODO
 	if rout.IsZero() {
-		fmt.Println("Route not found")
+		r.log.Error().Str("route", newPath).Msg("route not found")
 
 		return
 	}
 
 	sess := r.store.Get(oldPage.GetSessionID())
 	if sess == nil {
-		// TODO
-		fmt.Println("Page session not found")
+		r.log.Error().Str("id", oldPage.GetSessionID()).Msg("page session not found")
 
 		return
 	}
@@ -274,7 +275,8 @@ func (r *Router) ReplacePage(newPath string, oldPage *l.Page, isHistory bool) {
 	}
 }
 
-func Link(path string, elements ...interface{}) *InternalRoute {
+// TODO: Google says these are not crawlable
+func Link(path string, elements ...any) *InternalRoute {
 	a := &InternalRoute{
 		Component: l.C("a",
 			l.PreventDefault(),
@@ -296,7 +298,7 @@ type InternalRoute struct {
 	pubSub *hlivekit.PubSub
 }
 
-func (a *InternalRoute) PubSubMount(ctx context.Context, pubSub *hlivekit.PubSub) {
+func (a *InternalRoute) PubSubMount(_ context.Context, pubSub *hlivekit.PubSub) {
 	a.pubSub = pubSub
 }
 

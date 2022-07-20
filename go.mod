@@ -3,8 +3,8 @@ module github.com/SamHennessy/hhot
 go 1.18
 
 require (
-	github.com/SamHennessy/hlive v0.0.0-20220629053552-187997e7bc79
-	github.com/fsnotify/fsnotify v1.5.1
+	github.com/SamHennessy/hlive v0.0.0-20220720071608-ea7b666331e6
+	github.com/fsnotify/fsnotify v1.5.4
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/rs/zerolog v1.27.0
 )
@@ -17,5 +17,5 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569 // indirect
-	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 )
