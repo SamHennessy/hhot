@@ -19,7 +19,7 @@ func NewAssetManager(sl ServiceLocator) *AssetManager {
 	}
 
 	if contents, err := os.ReadFile("./assets/dist/js/app.js"); err != nil {
-		am.logger.Err(err).Msg("asset manager: read app.js")
+		am.logger.Warn().Err(err).Msg("asset manager: read app.js")
 	} else {
 		am.js = contents
 		am.hashJS = fmt.Sprintf("%x", sha1.Sum(contents))
@@ -119,14 +119,19 @@ func (am *AssetManager) favicons(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (am *AssetManager) Tags() *l.NodeGroup {
-	return l.G(
+	g := l.G(
 		l.T("link", l.Attrs{"rel": "stylesheet", "href": am.path("css/app.css?v=" + am.hashCSS)}),
-		l.T("script", l.Attrs{"src": am.path("js/app.js?v=" + am.hashJS), "defer": ""}),
 		l.T("link", l.Attrs{"rel": "apple-touch-icon", "sizes": "180x180", "href": am.pathFav("apple-touch-icon.png")}),
 		l.T("link", l.Attrs{"rel": "icon", "type": "image/png", "sizes": "32x32", "href": am.pathFav("favicon-32x32.png")}),
 		l.T("link", l.Attrs{"rel": "icon", "type": "image/png", "sizes": "16x16", "href": am.pathFav("favicon-16x16.png")}),
 		l.T("link", l.Attrs{"rel": "manifest", "href": am.pathFav("site.webmanifest")}),
 	)
+
+	if len(am.js) > 0 {
+		g.Add(l.T("script", l.Attrs{"src": am.path("js/app.js?v=" + am.hashJS), "defer": ""}))
+	}
+
+	return g
 }
 
 func (am *AssetManager) Middleware(next http.Handler) http.Handler {
