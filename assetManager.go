@@ -138,6 +138,8 @@ func (am *AssetManager) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == am.path("css/app.css") {
 			w.Header().Add("Content-Type", "text/css")
+			w.Header().Set("Cache-Control", "max-age:31536000, public")
+
 			_, err := w.Write(am.css)
 			if err != nil {
 				am.logger.Err(err).Msg("serve app.css")
@@ -148,6 +150,7 @@ func (am *AssetManager) Middleware(next http.Handler) http.Handler {
 
 		if r.URL.Path == am.path("js/app.js") {
 			w.Header().Add("Content-Type", "text/javascript")
+			w.Header().Set("Cache-Control", "max-age:31536000, public")
 
 			_, err := w.Write(am.js)
 			if err != nil {
@@ -184,6 +187,8 @@ func (am *AssetManager) Middleware(next http.Handler) http.Handler {
 
 func (am *AssetManager) fonts(w http.ResponseWriter, r *http.Request) bool {
 	if strings.HasPrefix(r.URL.Path, am.pathFont("")) {
+		w.Header().Set("Cache-Control", "max-age:31536000, public")
+
 		file := strings.TrimPrefix(r.URL.Path, am.pathFont(""))
 		http.ServeFile(w, r, "./assets/dist/fonts/"+file)
 
