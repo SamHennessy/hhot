@@ -2,17 +2,18 @@ package main
 
 import (
 	"context"
-	"github.com/SamHennessy/hhot/hhotui/domain"
-	"github.com/SamHennessy/hhot/hhotui/domain/topics"
-	"github.com/SamHennessy/hhot/hhotui/site"
-	"github.com/SamHennessy/hlive/hlivekit"
-	"github.com/fsnotify/fsnotify"
 	"io/fs"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"github.com/SamHennessy/hhot/hhotui/domain"
+	"github.com/SamHennessy/hhot/hhotui/domain/topics"
+	"github.com/SamHennessy/hhot/hhotui/site"
+	"github.com/SamHennessy/hlive/hlivekit"
+	"github.com/fsnotify/fsnotify"
 )
 
 func main() {

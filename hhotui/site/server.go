@@ -149,7 +149,6 @@ func (s *Server) MainLoop(outerCTX context.Context, watcher *fsnotify.Watcher) {
 
 			s.sl.Logger().Trace().Str("name", event.Name).Str("op", event.Op.String()).Msg("watcher event")
 			if event.Op&fsnotify.Write == fsnotify.Write {
-
 				if strings.HasSuffix(event.Name, ".go") {
 					now := time.Now()
 

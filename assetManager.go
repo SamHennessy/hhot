@@ -18,6 +18,7 @@ func NewAssetManager(sl ServiceLocator) *AssetManager {
 		config: sl.Config(),
 	}
 
+	// TODO: stop this and use file server as it manages cache checks
 	if contents, err := os.ReadFile("./assets/dist/js/app.js"); err != nil {
 		am.logger.Warn().Err(err).Msg("asset manager: read app.js")
 	} else {
@@ -28,7 +29,6 @@ func NewAssetManager(sl ServiceLocator) *AssetManager {
 	if contents, err := os.ReadFile("./assets/dist/css/app.css"); err != nil {
 		am.logger.Err(err).Msg("asset manager: read app.css")
 	} else {
-		am.css = contents
 		am.hashCSS = fmt.Sprintf("%x", sha1.Sum(contents))
 	}
 
@@ -40,7 +40,6 @@ type AssetManager struct {
 	config  Config
 	js      []byte
 	hashJS  string
-	css     []byte
 	hashCSS string
 }
 
@@ -64,30 +63,8 @@ func (am *AssetManager) pathJs(path string) string {
 	return am.config.BasePath() + "js/" + path
 }
 
-// TODO: Deprecate
-func (am *AssetManager) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == am.path("css/app.css") {
-		w.Header().Add("Content-Type", "text/css")
-		_, err := w.Write(am.css)
-		if err != nil {
-			am.logger.Err(err).Msg("serve app.css")
-		}
-
-		return
-	}
-
-	if r.URL.Path == am.path("js/app.js") {
-		w.Header().Add("Content-Type", "text/javascript")
-
-		_, err := w.Write(am.js)
-		if err != nil {
-			am.logger.Err(err).Msg("serve app.js")
-		}
-
-		return
-	}
-
-	w.WriteHeader(http.StatusNotFound)
+func (am *AssetManager) pathCSS(path string) string {
+	return am.config.BasePath() + "css/" + path
 }
 
 // https://www.emergeinteractive.com/insights/detail/the-essentials-of-favicons/
@@ -101,7 +78,7 @@ func (am *AssetManager) favicons(w http.ResponseWriter, r *http.Request) bool {
 		} else {
 			fileContents = bytes.ReplaceAll(fileContents, []byte("[iconPath]"), []byte(am.pathFav("")))
 
-			_, err = w.Write(fileContents)
+			_, _ = w.Write(fileContents)
 		}
 
 		return true
@@ -138,19 +115,23 @@ func (am *AssetManager) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == am.path("css/app.css") {
 			w.Header().Add("Content-Type", "text/css")
-			w.Header().Set("Cache-Control", "max-age:31536000, public")
 
-			_, err := w.Write(am.css)
-			if err != nil {
-				am.logger.Err(err).Msg("serve app.css")
+			if r.URL.Query().Get("v") != "" {
+				w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
 			}
+
+			file := strings.TrimPrefix(r.URL.Path, am.pathCSS(""))
+			http.ServeFile(w, r, "./assets/dist/css/"+file)
 
 			return
 		}
 
 		if r.URL.Path == am.path("js/app.js") {
 			w.Header().Add("Content-Type", "text/javascript")
-			w.Header().Set("Cache-Control", "max-age:31536000, public")
+
+			if r.URL.Query().Get("v") != "" {
+				w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
+			}
 
 			_, err := w.Write(am.js)
 			if err != nil {
@@ -187,7 +168,8 @@ func (am *AssetManager) Middleware(next http.Handler) http.Handler {
 
 func (am *AssetManager) fonts(w http.ResponseWriter, r *http.Request) bool {
 	if strings.HasPrefix(r.URL.Path, am.pathFont("")) {
-		w.Header().Set("Cache-Control", "max-age:31536000, public")
+		// Assume fonts don't change
+		w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
 
 		file := strings.TrimPrefix(r.URL.Path, am.pathFont(""))
 		http.ServeFile(w, r, "./assets/dist/fonts/"+file)
@@ -200,6 +182,10 @@ func (am *AssetManager) fonts(w http.ResponseWriter, r *http.Request) bool {
 
 func (am *AssetManager) images(w http.ResponseWriter, r *http.Request) bool {
 	if strings.HasPrefix(r.URL.Path, am.pathImg("")) {
+		if r.URL.Query().Get("v") != "" {
+			w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
+		}
+
 		file := strings.TrimPrefix(r.URL.Path, am.pathImg(""))
 		http.ServeFile(w, r, "./assets/dist/img/"+file)
 
@@ -209,6 +195,7 @@ func (am *AssetManager) images(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
+// TODO: add hash?
 func (am *AssetManager) ImageSrc(path string) string {
 	return am.config.BasePath() + "img/" + path
 }

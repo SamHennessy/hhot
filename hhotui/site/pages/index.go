@@ -343,7 +343,6 @@ func buildMessage(sl ServiceLocator) l.Componenter {
 	update(appBuild)
 
 	renderApp := func(app *domain.App) {
-
 	}
 
 	// SSR

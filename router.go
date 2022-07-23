@@ -112,7 +112,6 @@ func (r *Router) Add(path string, pageFn func() *l.Page, methods ...string) {
 	r.routes[path] = newRoute
 
 	r.addRouteToTree(newRoute)
-
 }
 
 func (r *Router) addRouteToTree(rout route) {

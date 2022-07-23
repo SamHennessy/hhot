@@ -1,5 +1,7 @@
 github.com/SamHennessy/hlive v0.0.0-20220721141101-4414cbdafcc1 h1:EZ0zB7wB5fXm9pBNb9W+5IE1mbbMzO0iJNklL3NuUs0=
 github.com/SamHennessy/hlive v0.0.0-20220721141101-4414cbdafcc1/go.mod h1:YFpfBOCiLIF9SoRFulgAGGLst/WX6x2BCpuVN36Nfe4=
+github.com/SamHennessy/hlive v0.0.0-20220723034556-ce5a4c0508b2 h1:QiuwG73utr1MA/jCIek6gSXclj7H06PU9slFb+rEGRQ=
+github.com/SamHennessy/hlive v0.0.0-20220723034556-ce5a4c0508b2/go.mod h1:YFpfBOCiLIF9SoRFulgAGGLst/WX6x2BCpuVN36Nfe4=
 github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927/go.mod h1:h/aW8ynjgkuj+NQRlZcDbAbM1ORAbXjXX77sX7T289U=
 github.com/coreos/go-systemd/v22 v22.3.3-0.20220203105225-a9a7ef127534/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/cornelk/hashmap v1.0.1 h1:RXGcy29hEdLLV8T6aK4s+BAd4tq4+3Hq50N2GoG0uIg=
@@ -46,4 +48,6 @@ golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220412211240-33da011f77ad/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 h1:0A+M6Uqn+Eje4kHMK80dtF3JCXC4ykBgQG4Fe06QRhQ=
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f h1:v4INt8xihDGvnrfjMDVXGxw9wrfxYyCjk0KbXjhR55s=
+golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 gopkg.in/square/go-jose.v2 v2.6.0 h1:NGk74WTnPKBNUhNzQX7PYcTLUjoq7mzKk2OKbvwk2iI=

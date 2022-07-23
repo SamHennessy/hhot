@@ -42,7 +42,6 @@ func (a *iframeReload) Initialize(page *l.Page) {
 }
 
 func (a *iframeReload) InitializeSSR(page *l.Page) {
-
 }
 
 type iframeWatcher struct {

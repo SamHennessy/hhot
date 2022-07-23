@@ -11,7 +11,6 @@ func AssetBuild() {
 	c.Dir = "./assets"
 
 	out, err := c.CombinedOutput()
-
 	if err != nil {
 		log.Println("Build CSS Error: ", err)
 	}

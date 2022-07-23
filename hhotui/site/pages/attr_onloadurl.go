@@ -28,5 +28,4 @@ func (a *OnloadAttribute) Initialize(page *l.Page) {
 }
 
 func (a *OnloadAttribute) InitializeSSR(page *l.Page) {
-
 }

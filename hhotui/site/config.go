@@ -1,7 +1,6 @@
 package site
 
-type Config struct {
-}
+type Config struct{}
 
 func (c *Config) BasePath() string {
 	return "/"

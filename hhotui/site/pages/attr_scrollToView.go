@@ -15,6 +15,7 @@ func scrollToView() l.AttributePluginer {
 		Attribute: l.NewAttribute(scrollToViewAttrName, ""),
 	}
 }
+
 func scrollToViewRemove() l.Attributer {
 	return l.NewAttribute(scrollToViewAttrName)
 }
@@ -31,5 +32,4 @@ func (a *scrollToViewAttribute) Initialize(page *l.Page) {
 }
 
 func (a *scrollToViewAttribute) InitializeSSR(page *l.Page) {
-
 }
