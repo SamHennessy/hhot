@@ -5,7 +5,7 @@ if (!window.hhotIframeWatcherDelay) {
     window.hhotIframeWatcherDelay = __iframeWatcherDelay__
 
     watcher = function () {
-        const els = document.querySelectorAll("[data-hlive-on*=__iframeWatcherEvent__]")
+        const els = document.querySelectorAll("[hon*=__iframeWatcherEvent__]");
 
         if (els.length === 0) {
             window.hhotIframeWatcherDelay = false

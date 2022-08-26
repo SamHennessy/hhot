@@ -46,11 +46,13 @@ func (a *iframeReload) InitializeSSR(page *l.Page) {
 
 type iframeWatcher struct {
 	*l.Attribute
+
+	rendered bool
 }
 
 func InstallIframeWatcher(eventHandler l.EventHandler) *l.ElementGroup {
 	return l.Elements(
-		&iframeWatcher{l.NewAttribute(iframeAttrWatcher, "")},
+		&iframeWatcher{Attribute: l.NewAttribute(iframeAttrWatcher, "")},
 		l.On(iframeWatcherEvent, eventHandler),
 	)
 }
@@ -59,11 +61,19 @@ func InstallIframeWatcher(eventHandler l.EventHandler) *l.ElementGroup {
 var iframeWatcherJS []byte
 
 func (a *iframeWatcher) Initialize(page *l.Page) {
+	if a.rendered {
+		return
+	}
+
 	js := strings.ReplaceAll(string(iframeWatcherJS), "__iframeWatcherEvent__", iframeWatcherEvent)
 	js = strings.ReplaceAll(js, "__iframeWatcherDelay__", iframeWatcherDelay)
 	page.DOM.Head.Add(l.T("script", l.HTML(js)))
 }
 
 func (a *iframeWatcher) InitializeSSR(page *l.Page) {
-	// Nop
+	a.rendered = true
+
+	js := strings.ReplaceAll(string(iframeWatcherJS), "__iframeWatcherEvent__", iframeWatcherEvent)
+	js = strings.ReplaceAll(js, "__iframeWatcherDelay__", iframeWatcherDelay)
+	page.DOM.Head.Add(l.T("script", l.HTML(js)))
 }

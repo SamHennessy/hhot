@@ -36,6 +36,7 @@ go install ./cmd/hhot
 - Allow adding of CSS and JS that is not app.js and app.css
 - Add hash to fav icons
   - Allow optional template variables to the manifest file for a hash?
+  - Or just use a manuel version number?
 - Images
   - Help to get image dimensions to prevent content shift
   - Build an img or picture tag?

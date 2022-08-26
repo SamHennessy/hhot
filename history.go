@@ -18,7 +18,7 @@ func NewPageHistoryManager(config Config) *PageHistoryManager {
 	return phm
 }
 
-func (phm *PageHistoryManager) OnPopState(ctx context.Context, e l.Event) {
+func (phm *PageHistoryManager) OnPopState(_ context.Context, e l.Event) {
 	phm.pubSub.Publish(TopicRedirectInternalHistory, e.Extra["path"])
 }
 
@@ -52,15 +52,20 @@ const (
 type PageHistory struct {
 	*l.Attribute
 
-	eb     *l.EventBinding
-	pubSub *hlivekit.PubSub
-	config Config
+	eb       *l.EventBinding
+	pubSub   *hlivekit.PubSub
+	config   Config
+	rendered bool
 }
 
 //go:embed history.js
 var historyJS []byte
 
 func (a *PageHistory) Initialize(page *l.Page) {
+	if a.rendered {
+		return
+	}
+
 	jsStr := strings.ReplaceAll(string(historyJS), pageHistoryEventBindingIDTemplateVar, a.eb.ID)
 	jsStr = strings.ReplaceAll(jsStr, pageHistoryEventAttrTemplateVar, pageHistoryAttrNamePush)
 	jsStr = strings.ReplaceAll(jsStr, pageHistoryTemplateVarBasePath, a.config.BasePath())
@@ -68,8 +73,14 @@ func (a *PageHistory) Initialize(page *l.Page) {
 	page.DOM.Head.Add(l.T("script", l.HTML(jsStr)), a.eb)
 }
 
-func (a *PageHistory) InitializeSSR(_ *l.Page) {
-	// Noop
+func (a *PageHistory) InitializeSSR(page *l.Page) {
+	a.rendered = true
+
+	jsStr := strings.ReplaceAll(string(historyJS), pageHistoryEventBindingIDTemplateVar, a.eb.ID)
+	jsStr = strings.ReplaceAll(jsStr, pageHistoryEventAttrTemplateVar, pageHistoryAttrNamePush)
+	jsStr = strings.ReplaceAll(jsStr, pageHistoryTemplateVarBasePath, a.config.BasePath())
+
+	page.DOM.Head.Add(l.T("script", l.HTML(jsStr)), a.eb)
 }
 
 func HistoryPush(path string, c l.Adder) {

@@ -19,9 +19,6 @@ func newAppIframe(sl ServiceLocator) *appIframe {
 		ComponentMountable: l.CM("div", l.Class("w-full h-full"), frame),
 	}
 
-	// SSR
-	c.render()
-
 	var subFn hlivekit.QueueSubscriber
 
 	c.MountFunc = func(ctx context.Context) {
@@ -43,7 +40,7 @@ func newAppIframe(sl ServiceLocator) *appIframe {
 	}
 
 	c.UnmountFunc = func(ctx context.Context) {
-		sl.AppPubSub().Unsubscribe(subFn, topics.AppStart, topics.AppStop)
+		sl.AppPubSub().Unsubscribe(subFn, topics.AppStart, topics.AppStop, topics.RefreshDo)
 	}
 
 	return c

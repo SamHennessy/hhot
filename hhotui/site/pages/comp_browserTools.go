@@ -43,7 +43,7 @@ func (b *browserPath) PubSubMount(ctx context.Context, pubSub *hlivekit.PubSub) 
 	}), topics.IframeUpdate)
 }
 
-func newBrowserTitle(elements ...interface{}) *browserTitle {
+func newBrowserTitle(elements ...any) *browserTitle {
 	c := &browserTitle{
 		Component: l.C("div", l.Class("px-2 truncate text-gray-300 font-thin"), elements),
 
