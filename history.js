@@ -12,7 +12,11 @@ if (hlive.afterMessage.get("hhhist") === undefined) {
         });
     });
 
-    window.onpopstate = function (event) {
+    // Init
+    const p = (location.pathname+location.search).substring("__base_path__".length);
+    history.replaceState({path: p}, null, p);
+
+    onpopstate = function (event) {
         let path = "/"
 
         if (event.state && event.state.path) {
