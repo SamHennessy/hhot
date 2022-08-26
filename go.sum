@@ -1,5 +1,5 @@
-github.com/SamHennessy/hlive v0.1.1-0.20220825133538-b3d8e28799e0 h1:G6ZlxM55UXIH+n0LMn7v8TE41wjqqkM/6UrYU/StX68=
-github.com/SamHennessy/hlive v0.1.1-0.20220825133538-b3d8e28799e0/go.mod h1:eFAg4ZNwP4tZi0JP85r+XTejkpm8hjYFstqx1OhpHrs=
+github.com/SamHennessy/hlive v0.1.1-0.20220826124206-b44df77ebc83 h1:5qGe6XK+5lF2STX/vvqbEvZHH98KvNB3xCMRgWJCp4E=
+github.com/SamHennessy/hlive v0.1.1-0.20220826124206-b44df77ebc83/go.mod h1:eFAg4ZNwP4tZi0JP85r+XTejkpm8hjYFstqx1OhpHrs=
 github.com/cespare/xxhash/v2 v2.1.1 h1:6MnRN8NT7+YBpUIWxHtefFZOKTAPgGjpQSxqLNn0+qY=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927/go.mod h1:h/aW8ynjgkuj+NQRlZcDbAbM1ORAbXjXX77sX7T289U=

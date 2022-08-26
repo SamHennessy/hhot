@@ -3,7 +3,7 @@ module github.com/SamHennessy/hhot
 go 1.18
 
 require (
-	github.com/SamHennessy/hlive v0.1.1-0.20220825133538-b3d8e28799e0
+	github.com/SamHennessy/hlive v0.1.1-0.20220826124206-b44df77ebc83
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/rs/zerolog v1.27.0
