@@ -13,7 +13,7 @@ if (hlive.afterMessage.get("hhhist") === undefined) {
     });
 
     // Init
-    const p = (location.pathname+location.search).substring("__base_path__".length);
+    const p = (location.pathname+location.search);
     history.replaceState({path: p}, null, p);
 
     onpopstate = function (event) {
