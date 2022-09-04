@@ -14,6 +14,7 @@ func NewPageHistoryManager(config Config) *PageHistoryManager {
 		config: config,
 	}
 	phm.eb = l.On("popstate", phm.OnPopState)
+	phm.eb.ID = "phm"
 
 	return phm
 }
