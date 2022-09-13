@@ -17,7 +17,7 @@ func scrollToView() l.AttributePluginer {
 }
 
 func scrollToViewRemove() l.Attributer {
-	return l.NewAttribute(scrollToViewAttrName)
+	return l.NewAttributePtr(scrollToViewAttrName, nil)
 }
 
 type scrollToViewAttribute struct {
@@ -28,7 +28,7 @@ type scrollToViewAttribute struct {
 var scrollToViewJS []byte
 
 func (a *scrollToViewAttribute) Initialize(page *l.Page) {
-	page.DOM.Head.Add(l.T("script", l.HTML(scrollToViewJS)))
+	page.DOM().Head().Add(l.T("script", l.HTML(scrollToViewJS)))
 }
 
 func (a *scrollToViewAttribute) InitializeSSR(page *l.Page) {

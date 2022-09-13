@@ -38,7 +38,7 @@ var iframeReloadJS []byte
 
 func (a *iframeReload) Initialize(page *l.Page) {
 	js := strings.ReplaceAll(string(iframeReloadJS), "__iframeAttrReload__", iframeAttrReload)
-	page.DOM.Head.Add(l.T("script", l.HTML(js)))
+	page.DOM().Head().Add(l.T("script", l.HTML(js)))
 }
 
 func (a *iframeReload) InitializeSSR(page *l.Page) {
@@ -67,7 +67,7 @@ func (a *iframeWatcher) Initialize(page *l.Page) {
 
 	js := strings.ReplaceAll(string(iframeWatcherJS), "__iframeWatcherEvent__", iframeWatcherEvent)
 	js = strings.ReplaceAll(js, "__iframeWatcherDelay__", iframeWatcherDelay)
-	page.DOM.Head.Add(l.T("script", l.HTML(js)))
+	page.DOM().Head().Add(l.T("script", l.HTML(js)))
 }
 
 func (a *iframeWatcher) InitializeSSR(page *l.Page) {
@@ -75,5 +75,5 @@ func (a *iframeWatcher) InitializeSSR(page *l.Page) {
 
 	js := strings.ReplaceAll(string(iframeWatcherJS), "__iframeWatcherEvent__", iframeWatcherEvent)
 	js = strings.ReplaceAll(js, "__iframeWatcherDelay__", iframeWatcherDelay)
-	page.DOM.Head.Add(l.T("script", l.HTML(js)))
+	page.DOM().Head().Add(l.T("script", l.HTML(js)))
 }

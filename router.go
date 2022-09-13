@@ -2,7 +2,6 @@ package hhot
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -240,36 +239,43 @@ func (r *Router) ReplacePage(newPath string, oldPage *l.Page, isHistory bool) {
 
 	// Found?
 	if rout.IsZero() {
-		r.log.Error().Str("route", newPath).Msg("route not found")
+		r.log.Error().Str("route", newPath).Msg("hhot: Router.ReplacePage: route not found")
 
 		return
 	}
 
-	sess := r.store.Get(oldPage.GetSessionID())
+	sessID := oldPage.GetSessionID()
+
+	sess := r.store.Get(sessID)
 	if sess == nil {
-		r.log.Error().Str("id", oldPage.GetSessionID()).Msg("page session not found")
+		r.log.Error().Str("sessID", oldPage.GetSessionID()).Msg("hhot: Router.ReplacePage: page session not found")
 
 		return
 	}
 
-	if oldPage.IsConnected() {
-		oldPage.Close(sess.InitialContext)
-	}
+	// TODO: can we get a lock to prevent other close calls?
+	oldPage.Close(sess.GetContextPage())
+	sess.GetPageContextCancel()()
+
+	contextPage, contextCancel := context.WithCancel(sess.GetContextInitial())
+	sess.SetContextPage(contextPage)
+	sess.SetContextCancel(contextCancel)
 
 	newPage := rout.pageFn()
-	newPage.DOMBrowser = oldPage.DOMBrowser
-	sess.Page = newPage
+	newPage.SetDOMBrowser(oldPage.DOMBrowser())
+	sess.SetPage(newPage)
 
 	// Browser History
 	if !isHistory {
-		HistoryPush(path, newPage.DOM.HTML)
+		HistoryPush(path, newPage.DOM().HTML())
 	}
 
-	ctx := context.WithValue(sess.InitialContext, ctxKeyRouteInfo, r.routeDataFromRequest(path, parts, rout))
+	ctx := context.WithValue(sess.GetContextPage(), ctxKeyRouteInfo, r.routeDataFromRequest(path, parts, rout))
 
-	err := newPage.ServeWS(ctx, sess.ID, sess.Send, sess.Receive)
+	err := newPage.ServeWS(ctx, sess.GetID(), sess.Send, sess.Receive)
 	if err != nil {
-		fmt.Println("ERROR: Replace Page: ServerWS: ", err)
+		r.log.Err(err).Msg("hhot: Router.ReplacePage: ServerWS")
+
 		return
 	}
 }

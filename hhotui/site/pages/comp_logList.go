@@ -19,7 +19,7 @@ func logList(sl ServiceLocator) l.Tagger {
 
 	topicList := []string{topics.LogUI, topics.OutputAppErr, topics.OutputAppStd, topics.LogsClear, topics.LogsAddMarker}
 
-	c.MountFunc = func(ctx context.Context) {
+	c.SetMount(func(ctx context.Context) {
 		subFn = hlivekit.NewSub(func(message hlivekit.QueueMessage) {
 			switch message.Topic {
 			case topics.LogsClear:
@@ -104,11 +104,11 @@ func logList(sl ServiceLocator) l.Tagger {
 		})
 
 		sl.AppPubSub().Subscribe(subFn, topicList...)
-	}
+	})
 
-	c.UnmountFunc = func(ctx context.Context) {
+	c.SetUnmount(func(ctx context.Context) {
 		sl.AppPubSub().Unsubscribe(subFn, topicList...)
-	}
+	})
 
 	return c
 }

@@ -23,7 +23,7 @@ func (phm *PageHistoryManager) OnPopState(_ context.Context, e l.Event) {
 	phm.pubSub.Publish(TopicRedirectInternalHistory, e.Extra["path"])
 }
 
-func (phm *PageHistoryManager) InstallPageHistory(pubSub *hlivekit.PubSub) l.Attributer {
+func (phm *PageHistoryManager) InstallPageHistory(pubSub *hlivekit.PubSub) *PageHistory {
 	phm.pubSub = pubSub
 	a := &PageHistory{
 		Attribute: l.NewAttribute(pageHistoryAttrNameOnPopState, ""),
@@ -71,7 +71,7 @@ func (a *PageHistory) Initialize(page *l.Page) {
 	jsStr = strings.ReplaceAll(jsStr, pageHistoryEventAttrTemplateVar, pageHistoryAttrNamePush)
 	jsStr = strings.ReplaceAll(jsStr, pageHistoryTemplateVarBasePath, a.config.BasePath())
 
-	page.DOM.Head.Add(l.T("script", l.HTML(jsStr)), a.eb)
+	page.DOM().Head().Add(l.T("script", l.HTML(jsStr)), a.eb)
 }
 
 func (a *PageHistory) InitializeSSR(page *l.Page) {
@@ -81,7 +81,7 @@ func (a *PageHistory) InitializeSSR(page *l.Page) {
 	jsStr = strings.ReplaceAll(jsStr, pageHistoryEventAttrTemplateVar, pageHistoryAttrNamePush)
 	jsStr = strings.ReplaceAll(jsStr, pageHistoryTemplateVarBasePath, a.config.BasePath())
 
-	page.DOM.Head.Add(l.T("script", l.HTML(jsStr)), a.eb)
+	page.DOM().Head().Add(l.T("script", l.HTML(jsStr)), a.eb)
 }
 
 func HistoryPush(path string, c l.Adder) {

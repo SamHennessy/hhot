@@ -17,7 +17,7 @@ func Index(sl ServiceLocator) func() *l.Page {
 	return func() *l.Page {
 		p := l.NewPage()
 
-		p.DOM.Head.Add(l.T("link",
+		p.DOM().Head().Add(l.T("link",
 			l.Attrs{"href": "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css", "rel": "stylesheet"}))
 
 		var mem runtime.MemStats
@@ -26,7 +26,7 @@ func Index(sl ServiceLocator) func() *l.Page {
 		allocTotal := ByteSize(mem.Sys)
 		memRun := true
 		allocH := l.CM("span", &alloc, "/", allocTotal)
-		allocH.MountFunc = func(ctx context.Context) {
+		allocH.SetMount(func(ctx context.Context) {
 			go func() {
 				for memRun {
 					time.Sleep(time.Second)
@@ -36,10 +36,10 @@ func Index(sl ServiceLocator) func() *l.Page {
 					l.Render(ctx)
 				}
 			}()
-		}
-		allocH.UnmountFunc = func(ctx context.Context) {
+		})
+		allocH.SetUnmount(func(ctx context.Context) {
 			memRun = false
-		}
+		})
 
 		logsDelete := l.C("button",
 			l.Class("flex flex-shrink-0 p-1 text-gray-200 bg-gray-500 hover:bg-gray-700 hover:text-gray-300"),
@@ -116,7 +116,7 @@ func Index(sl ServiceLocator) func() *l.Page {
 			),
 		)
 
-		p.DOM.Body.Add(
+		p.DOM().Body().Add(
 			l.T("div", l.Class("h-screen"),
 				l.T("div", l.Class("h-4/5"),
 					buildMessage(sl),
@@ -179,7 +179,7 @@ func buildLabel(sl ServiceLocator) l.Tagger {
 
 	var subFn hlivekit.QueueSubscriber
 
-	c.MountFunc = func(ctx context.Context) {
+	c.SetMount(func(ctx context.Context) {
 		onBuild := func(build domain.Build) {
 			updateStatus(build)
 
@@ -206,11 +206,11 @@ func buildLabel(sl ServiceLocator) l.Tagger {
 
 		// Init
 		onBuild(sl.App().Build)
-	}
+	})
 
-	c.UnmountFunc = func(ctx context.Context) {
+	c.SetUnmount(func(ctx context.Context) {
 		sl.AppPubSub().Unsubscribe(subFn, topics.Build)
-	}
+	})
 
 	return c
 }
@@ -263,7 +263,7 @@ func appLabel(sl ServiceLocator) l.Tagger {
 
 	var subFn hlivekit.QueueSubscriber
 
-	c.MountFunc = func(ctx context.Context) {
+	c.SetMount(func(ctx context.Context) {
 		onBuild := func(app *domain.App) {
 			updateStatus(app)
 
@@ -290,11 +290,11 @@ func appLabel(sl ServiceLocator) l.Tagger {
 
 		// Init
 		onBuild(sl.App())
-	}
+	})
 
-	c.UnmountFunc = func(ctx context.Context) {
+	c.SetUnmount(func(ctx context.Context) {
 		sl.AppPubSub().Unsubscribe(subFn, topics.AppStart, topics.AppStop)
-	}
+	})
 
 	return c
 }
@@ -353,7 +353,7 @@ func buildMessage(sl ServiceLocator) l.Componenter {
 		subFnApp   hlivekit.QueueSubscriber
 	)
 
-	c.MountFunc = func(ctx context.Context) {
+	c.SetMount(func(ctx context.Context) {
 		subFnBuild = hlivekit.NewSub(func(message hlivekit.QueueMessage) {
 			build, ok := message.Value.(domain.Build)
 			if !ok {
@@ -386,12 +386,12 @@ func buildMessage(sl ServiceLocator) l.Componenter {
 		// Initial render
 		update(sl.App().Build)
 		renderApp(sl.App())
-	}
+	})
 
-	c.UnmountFunc = func(ctx context.Context) {
+	c.SetUnmount(func(ctx context.Context) {
 		sl.AppPubSub().Unsubscribe(subFnBuild, topics.Build)
 		sl.AppPubSub().Unsubscribe(subFnApp, topics.AppStart, topics.AppStop)
-	}
+	})
 
 	return c
 }
@@ -407,6 +407,7 @@ const (
 )
 
 // ByteSize returns a human-readable byte string of the form 10M, 12.5K, and so forth.  The following units are available:
+//
 //	E: Exabyte
 //	P: Petabyte
 //	T: Terabyte
@@ -414,6 +415,7 @@ const (
 //	M: Megabyte
 //	K: Kilobyte
 //	B: Byte
+//
 // The unit that results in the smallest number greater than or equal to 1 is always chosen.
 func ByteSize(bytes uint64) string {
 	unit := ""

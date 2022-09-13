@@ -53,20 +53,7 @@ func Router(sl *ServiceLocatorSite) {
 			// Page level AppPubSub not Site level
 			pubSub := hlivekit.NewPubSub()
 
-			page.DOM.HTML.Add(hlivekit.InstallPubSub(pubSub))
-			// page.DOM.HTML.Add(phm.InstallPageHistory(pubSub))
-			// page.DOM.Head.Add(sl.AssetManager().Tags())
-
-			// pubSub.Subscribe(hlivekit.NewSub(func(message hlivekit.QueueMessage) {
-			// 	path, ok := message.Value.(string)
-			// 	if !ok {
-			// 		return
-			// 	}
-			//
-			// 	// I think using go here will let the page that called this close
-			// 	// I can't think of a good reason they would want to block
-			// 	go hhr.ReplacePage(path, page, message.Topic == hhot.TopicRedirectInternalHistory)
-			// }), hhot.TopicRedirectInternal, hhot.TopicRedirectInternalHistory)
+			page.DOM().HTML().Add(hlivekit.InstallPubSub(pubSub))
 
 			return page
 		}

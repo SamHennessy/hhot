@@ -21,7 +21,7 @@ func newAppIframe(sl ServiceLocator) *appIframe {
 
 	var subFn hlivekit.QueueSubscriber
 
-	c.MountFunc = func(ctx context.Context) {
+	c.SetMount(func(ctx context.Context) {
 		subFn = hlivekit.NewSub(func(message hlivekit.QueueMessage) {
 			if message.Topic == topics.RefreshDo {
 				IframeReload(frame)
@@ -37,11 +37,11 @@ func newAppIframe(sl ServiceLocator) *appIframe {
 
 		// Init
 		c.render()
-	}
+	})
 
-	c.UnmountFunc = func(ctx context.Context) {
+	c.SetUnmount(func(ctx context.Context) {
 		sl.AppPubSub().Unsubscribe(subFn, topics.AppStart, topics.AppStop, topics.RefreshDo)
-	}
+	})
 
 	return c
 }

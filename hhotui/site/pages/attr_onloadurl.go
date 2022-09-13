@@ -24,7 +24,7 @@ type OnloadAttribute struct {
 var attrOnloadURL []byte
 
 func (a *OnloadAttribute) Initialize(page *l.Page) {
-	page.DOM.Head.Add(l.T("script", l.HTML(attrOnloadURL)))
+	page.DOM().Head().Add(l.T("script", l.HTML(attrOnloadURL)))
 }
 
 func (a *OnloadAttribute) InitializeSSR(page *l.Page) {
