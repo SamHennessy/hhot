@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"strings"
+	"sync"
 
 	l "github.com/SamHennessy/hlive"
 	"github.com/SamHennessy/hlive/hlivekit"
@@ -20,19 +21,25 @@ func NewPageHistoryManager(config Config) *PageHistoryManager {
 }
 
 func (phm *PageHistoryManager) OnPopState(_ context.Context, e l.Event) {
+	phm.mu.RLock()
+	defer phm.mu.RUnlock()
+
 	phm.pubSub.Publish(TopicRedirectInternalHistory, e.Extra["path"])
 }
 
 func (phm *PageHistoryManager) InstallPageHistory(pubSub *hlivekit.PubSub) *PageHistory {
+	phm.mu.Lock()
+	defer phm.mu.Unlock()
+
 	phm.pubSub = pubSub
-	a := &PageHistory{
+	phm.attr = &PageHistory{
 		Attribute: l.NewAttribute(pageHistoryAttrNameOnPopState, ""),
 		pubSub:    pubSub,
 		eb:        phm.eb,
 		config:    phm.config,
 	}
 
-	return a
+	return phm.attr
 }
 
 type PageHistoryManager struct {
@@ -40,6 +47,7 @@ type PageHistoryManager struct {
 	pubSub *hlivekit.PubSub
 	attr   *PageHistory
 	eb     *l.EventBinding
+	mu     sync.RWMutex
 }
 
 const (
@@ -57,12 +65,16 @@ type PageHistory struct {
 	pubSub   *hlivekit.PubSub
 	config   Config
 	rendered bool
+	mu       sync.Mutex
 }
 
 //go:embed history.js
 var historyJS []byte
 
 func (a *PageHistory) Initialize(page *l.Page) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
 	if a.rendered {
 		return
 	}
@@ -75,6 +87,9 @@ func (a *PageHistory) Initialize(page *l.Page) {
 }
 
 func (a *PageHistory) InitializeSSR(page *l.Page) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
 	a.rendered = true
 
 	jsStr := strings.ReplaceAll(string(historyJS), pageHistoryEventBindingIDTemplateVar, a.eb.ID)
