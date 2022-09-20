@@ -1,18 +1,18 @@
 module github.com/SamHennessy/hhot
 
-go 1.18
+go 1.19
 
 require (
-	github.com/SamHennessy/hlive v0.1.1-0.20220915095737-a268595cd5a6
+	github.com/SamHennessy/hlive v0.1.1-0.20220920142641-39e3bf350d59
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
 	github.com/rs/zerolog v1.27.0
 )
 
 require (
+	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/cornelk/hashmap v1.0.1 // indirect
-	github.com/dchest/siphash v1.2.3 // indirect
+	github.com/cornelk/hashmap v1.0.6 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect

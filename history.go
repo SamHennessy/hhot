@@ -32,20 +32,18 @@ func (phm *PageHistoryManager) InstallPageHistory(pubSub *hlivekit.PubSub) *Page
 	defer phm.mu.Unlock()
 
 	phm.pubSub = pubSub
-	phm.attr = &PageHistory{
+
+	return &PageHistory{
 		Attribute: l.NewAttribute(pageHistoryAttrNameOnPopState, ""),
 		pubSub:    pubSub,
 		eb:        phm.eb,
 		config:    phm.config,
 	}
-
-	return phm.attr
 }
 
 type PageHistoryManager struct {
 	config Config
 	pubSub *hlivekit.PubSub
-	attr   *PageHistory
 	eb     *l.EventBinding
 	mu     sync.RWMutex
 }
@@ -102,6 +100,6 @@ func (a *PageHistory) InitializeSSR(page *l.Page) {
 func HistoryPush(path string, c l.Adder) {
 	c.Add(l.Attrs{pageHistoryAttrNamePush: path})
 	c.Add(hlivekit.OnDiffApplyOnce(func(ctx context.Context, e l.Event) {
-		c.Add(l.Attrs{pageHistoryAttrNamePush: nil})
+		c.Add(l.AttrsOff{pageHistoryAttrNamePush})
 	}))
 }

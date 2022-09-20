@@ -16,8 +16,8 @@ func scrollToView() l.AttributePluginer {
 	}
 }
 
-func scrollToViewRemove() l.Attributer {
-	return l.NewAttributePtr(scrollToViewAttrName, nil)
+func scrollToViewRemove() l.AttrsOff {
+	return l.AttrsOff{scrollToViewAttrName}
 }
 
 type scrollToViewAttribute struct {

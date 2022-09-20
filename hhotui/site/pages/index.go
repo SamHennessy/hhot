@@ -20,25 +20,26 @@ func Index(sl ServiceLocator) func() *l.Page {
 		p.DOM().Head().Add(l.T("link",
 			l.Attrs{"href": "https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css", "rel": "stylesheet"}))
 
-		var mem runtime.MemStats
-		runtime.ReadMemStats(&mem)
-		alloc := ByteSize(mem.Alloc)
-		allocTotal := ByteSize(mem.Sys)
-		memRun := true
-		allocH := l.CM("span", &alloc, "/", allocTotal)
+		alloc := l.Box("")
+		allocTotal := l.Box("")
+		memRun := l.NewLockBox(true)
+		allocH := l.CM("span", alloc, "/", allocTotal)
 		allocH.SetMount(func(ctx context.Context) {
 			go func() {
-				for memRun {
-					time.Sleep(time.Second)
-
+				for memRun.Get() {
+					var mem runtime.MemStats
 					runtime.ReadMemStats(&mem)
-					alloc = ByteSize(mem.Alloc)
-					l.Render(ctx)
+					alloc.Set(ByteSize(mem.Alloc))
+					allocTotal.Set(ByteSize(mem.Sys))
+
+					l.RenderComponent(ctx, allocH)
+
+					time.Sleep(time.Second)
 				}
 			}()
 		})
 		allocH.SetUnmount(func(ctx context.Context) {
-			memRun = false
+			memRun.Set(false)
 		})
 
 		logsDelete := l.C("button",
@@ -131,15 +132,15 @@ func Index(sl ServiceLocator) func() *l.Page {
 }
 
 func buildLabel(sl ServiceLocator) l.Tagger {
-	var statusMessage string
+	statusMessage := l.Box("")
 	statusMessageC := l.T("div",
 		l.Class("py-px px-1 ml-1 rounded-l md:w-20 flex"),
 		iconHammer,
 		l.T("div", l.Class("flex-grow")),
-		l.T("div", l.Class("hidden md:inline-block"), &statusMessage))
+		l.T("div", l.Class("hidden md:inline-block"), statusMessage))
 
-	var statusTime string
-	statusTimeC := l.T("div", l.Class("py-px px-0.5 mr-1 rounded-r bg-gray-700 text-gray-400 w-16 text-center"), &statusTime)
+	statusTime := l.Box("")
+	statusTimeC := l.T("div", l.Class("py-px px-0.5 mr-1 rounded-r bg-gray-700 text-gray-400 w-16 text-center"), statusTime)
 
 	statusC := l.T("div", l.Class("flex flex-shrink-0 items-center"), statusMessageC, " ", statusTimeC)
 
@@ -156,22 +157,22 @@ func buildLabel(sl ServiceLocator) l.Tagger {
 
 		switch build.Status {
 		case domain.BuildStatusEmpty:
-			statusMessage = "Waiting"
+			statusMessage.Set("Waiting")
 			colourCSS["bg-gray-400"] = true
 		case domain.BuildStatusFailed:
-			statusMessage = "Failed"
+			statusMessage.Set("Failed")
 			colourCSS["bg-red-400"] = true
 		case domain.BuildStatusInProgress:
-			statusMessage = "Building"
+			statusMessage.Set("Building")
 			colourCSS["bg-yellow-400"] = true
 		case domain.BuildStatusSuccess:
-			statusMessage = "Success"
+			statusMessage.Set("Success")
 			colourCSS["bg-green-400"] = true
 		}
 
 		statusMessageC.Add(colourCSS)
 
-		statusTime = build.BuildDuration().Truncate(time.Millisecond).String()
+		statusTime.Set(build.BuildDuration().Truncate(time.Millisecond).String())
 	}
 
 	// SSR
@@ -216,15 +217,15 @@ func buildLabel(sl ServiceLocator) l.Tagger {
 }
 
 func appLabel(sl ServiceLocator) l.Tagger {
-	var statusMessage string
+	statusMessage := l.Box("")
 	statusMessageC := l.T("div",
 		l.Class("py-px px-1 rounded-l md:w-20 flex"),
 		iconPlay,
 		l.T("div", l.Class("flex-grow")),
-		l.T("div", l.Class("hidden md:inline-block"), &statusMessage))
+		l.T("div", l.Class("hidden md:inline-block"), statusMessage))
 
-	var statusTime string
-	statusTimeC := l.T("div", l.Class("py-px px-0.5 mr-1 rounded-r bg-gray-700 text-gray-400 w-16 text-center"), &statusTime)
+	statusTime := l.Box("")
+	statusTimeC := l.T("div", l.Class("py-px px-0.5 mr-1 rounded-r bg-gray-700 text-gray-400 w-16 text-center"), statusTime)
 
 	statusC := l.T("div", l.Class("flex flex-shrink-0 items-center"), statusMessageC, " ", statusTimeC)
 
@@ -242,16 +243,16 @@ func appLabel(sl ServiceLocator) l.Tagger {
 
 		switch app.Runtime.Status {
 		case domain.RuntimeStatusEmpty:
-			statusMessage = "Waiting"
-			statusTime = "-s"
+			statusMessage.Set("Waiting")
+			statusTime.Set("-s")
 			colourCSS["bg-gray-400"] = true
 		case domain.RuntimeStatusRunning:
-			statusMessage = "Running"
-			statusTime = app.Runtime.Time().Truncate(time.Second).String()
+			statusMessage.Set("Running")
+			statusTime.Set(app.Runtime.Time().Truncate(time.Second).String())
 			colourCSS["bg-green-400"] = true
 		case domain.RuntimeStatusStopped:
-			statusMessage = "Stopped"
-			statusTime = "-s"
+			statusMessage.Set("Stopped")
+			statusTime.Set("-s")
 			colourCSS["bg-red-400"] = true
 		}
 
@@ -304,32 +305,32 @@ func buildMessage(sl ServiceLocator) l.Componenter {
 
 	appBuild := sl.App().Build
 
-	heading := ""
-	output := ""
+	heading := l.Box("")
+	output := l.Box("")
 
 	c.Add(
 		l.Class("flex flex-col"),
 		l.T("div", l.Style{"height": "80vh"}, l.Class("overflow-scroll overscroll-contain"),
 			l.T("div",
 				l.Class("bg-gray-200 text-sm m-2 p-3 rounded-lg"),
-				l.T("h1", l.Class("text-2xl m-5"), &heading),
-				l.T("pre", &output),
+				l.T("h1", l.Class("text-2xl m-5"), heading),
+				l.T("pre", output),
 			),
 		),
 	)
 
 	update := func(build domain.Build) {
-		output = build.Output
+		output.Set(build.Output)
 
 		switch build.Status {
 		case domain.BuildStatusEmpty:
-			heading = "Waiting for first build..."
+			heading.Set("Waiting for first build...")
 		case domain.BuildStatusFailed:
-			heading = "Build failed"
+			heading.Set("Build failed")
 		case domain.BuildStatusSuccess:
-			heading = "Build success"
+			heading.Set("Build success")
 		case domain.BuildStatusInProgress:
-			heading = "Building..."
+			heading.Set("Building...")
 		}
 
 		if build.Status == domain.BuildStatusFailed || build.Status == domain.BuildStatusInProgress {

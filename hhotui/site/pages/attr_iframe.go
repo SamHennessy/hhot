@@ -19,7 +19,7 @@ const (
 func IframeReload(c l.Adder) {
 	c.Add(newIframeReload())
 	c.Add(hlivekit.OnDiffApplyOnce(func(ctx context.Context, e l.Event) {
-		c.Add(l.Attrs{iframeAttrReload: nil})
+		c.Add(l.AttrsOff{iframeAttrReload})
 	}))
 }
 

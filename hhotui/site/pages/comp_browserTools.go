@@ -12,13 +12,14 @@ func newBrowserPath(elements ...interface{}) *browserPath {
 	c := &browserPath{
 		Component: l.C("div", elements),
 
-		path: "Loading...",
+		path: l.NewLockBox("Loading..."),
 	}
 
 	c.Add(
 		l.T("input",
 			l.Class("w-full px-2 py-1"),
-			l.Attrs{"value": &c.path, "autocomplete": "off"},
+			l.Attrs{"autocomplete": "off"},
+			l.AttrsLockBox{"value": c.path},
 		),
 	)
 
@@ -28,7 +29,7 @@ func newBrowserPath(elements ...interface{}) *browserPath {
 type browserPath struct {
 	*l.Component
 
-	path string
+	path *l.LockBox[string]
 }
 
 func (b *browserPath) PubSubMount(ctx context.Context, pubSub *hlivekit.PubSub) {
@@ -39,7 +40,7 @@ func (b *browserPath) PubSubMount(ctx context.Context, pubSub *hlivekit.PubSub) 
 			return
 		}
 
-		b.path = data.path
+		b.path.Set(data.path)
 	}), topics.IframeUpdate)
 }
 
@@ -47,10 +48,10 @@ func newBrowserTitle(elements ...any) *browserTitle {
 	c := &browserTitle{
 		Component: l.C("div", l.Class("px-2 truncate text-gray-300 font-thin"), elements),
 
-		title: "Loading...",
+		title: l.Box("Loading..."),
 	}
 
-	c.Add(&c.title)
+	c.Add(c.title)
 
 	return c
 }
@@ -58,7 +59,7 @@ func newBrowserTitle(elements ...any) *browserTitle {
 type browserTitle struct {
 	*l.Component
 
-	title string
+	title *l.NodeBox[string]
 }
 
 func (b *browserTitle) PubSubMount(ctx context.Context, pubSub *hlivekit.PubSub) {
@@ -69,6 +70,6 @@ func (b *browserTitle) PubSubMount(ctx context.Context, pubSub *hlivekit.PubSub)
 			return
 		}
 
-		b.title = data.title
+		b.title.Set(data.title)
 	}), topics.IframeUpdate)
 }
